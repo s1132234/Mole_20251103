@@ -26,6 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import tw.edu.pu.o365.s1132234.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -46,8 +48,16 @@ fun MoleScreen(moleViewModel: MoleViewModel = viewModel()) {
     //var counter by rememberSaveable { mutableLongStateOf(0) }
     val stay = moleViewModel.stay
 
+    val density = LocalDensity.current
+
+    // 地鼠Dp轉Px
+    val moleSizeDp = 150.dp
+    val moleSizePx = with(density) { moleSizeDp.roundToPx() }
+
     Box (
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .onSizeChanged { intSize ->
+                moleViewModel.getArea(intSize, moleSizePx) },
         Alignment.Center
     ) {
         Text("分數: $counter \n時間: $stay")
@@ -57,8 +67,8 @@ fun MoleScreen(moleViewModel: MoleViewModel = viewModel()) {
         painter = painterResource(id = R.drawable.mole),
         contentDescription = "地鼠",
         modifier = Modifier
-            .offset { IntOffset(600, 800) }
-            .size(150.dp)
+            .offset { IntOffset(moleViewModel.offsetX, moleViewModel.offsetY) }
+            .size(moleSizeDp)
             .clickable {  moleViewModel.incrementCounter() }
     )
 }
