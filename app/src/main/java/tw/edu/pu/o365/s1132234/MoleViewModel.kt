@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 
 class MoleViewModel: ViewModel() {
 
+    private val GAME_DURATION = 60L
+
     var counter by mutableLongStateOf(0)
         private set
 
@@ -30,8 +32,13 @@ class MoleViewModel: ViewModel() {
     var stay by mutableLongStateOf(0)
         private set
 
+    var isGameActive by mutableStateOf(true)
+        private set
+
     fun incrementCounter() {
-        counter++
+        if (isGameActive) {
+            counter++
+        }
     }
 
     init {
@@ -40,11 +47,14 @@ class MoleViewModel: ViewModel() {
 
     private fun startCounting() {
         viewModelScope.launch {
-            while (true) {
-                delay(1000L)
+            // 將 while(true) 改為 while (stay < GAME_DURATION)
+            while (stay < GAME_DURATION) {
+                delay(1000L) // 等待 1 秒
                 stay++
                 moveMole()
             }
+
+            isGameActive = false
         }
     }
 
@@ -53,10 +63,11 @@ class MoleViewModel: ViewModel() {
         maxY = gameSize.height - moleSize
     }
 
-
     fun moveMole() {
-        offsetX = (0..maxX).random()
-        offsetY = (0..maxY).random()
+        if (isGameActive) {
+            offsetX = (0..maxX).random()
+            offsetY = (0..maxY).random()
+        }
     }
 
 }
